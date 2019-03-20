@@ -2,6 +2,7 @@ package veeronten.hackathon
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
@@ -21,15 +22,19 @@ class TheMazeGame : Game() {
     lateinit var font: BitmapFont
     lateinit var music: Music
     lateinit var wallVisibleImg: Texture
+    lateinit var inputMultiplexer: InputMultiplexer
 
     override fun create() {
         camera = OrthographicCamera()
         camera.setToOrtho(false, WIDTH.toFloat(), HEIGHT.toFloat())
         batch = SpriteBatch()
         font = BitmapFont()
-        Gdx.input.inputProcessor = DesktopInputProcessor(camera)
 
         wallVisibleImg = Texture("wall_visible.jpg")
+
+        inputMultiplexer = InputMultiplexer()
+        inputMultiplexer.addProcessor(DesktopInputProcessor(camera))
+        Gdx.input.inputProcessor = inputMultiplexer
 
         music = Gdx.audio.newMusic(Gdx.files.internal("OST.mp3"))
         music.isLooping = true

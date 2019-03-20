@@ -10,7 +10,7 @@ class DesktopInputProcessor(private val camera: OrthographicCamera) : InputProce
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         lastTouch.set(screenX.toFloat(), screenY.toFloat())
-        return true
+        return false
     }
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {

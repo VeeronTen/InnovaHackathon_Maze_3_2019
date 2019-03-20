@@ -11,10 +11,8 @@ const val WALL: Int = 1
 
 object MazeSource {
 
-    private var tunnelsCount = 5
     private var tunnelMaxLength = 10
 
-    private val roomsCount = 6
     private val roomMixSize = 8
 
     var mazeArray = GdxArray<GdxArray<Int>>()
@@ -26,19 +24,22 @@ object MazeSource {
     private val startPoints = GdxArray<Pair<Int, Int>>()
 
     init {
+        generate(mazeX, mazeY)
+    }
+
+
+    fun generate(width: Int, height: Int) {
+        mazeX = width
+        mazeY = height
+
+        startPoints.clear()
         setEmptyMaze()
 
         startPoints.add(Pair(1, 1))
         startPoints.forEach {
             generateWays(it.first, it.second)
         }
-
-//        for (i in 0 until tunnelsCount) addTunnel()
-//        for (i in 0 until roomsCount) addRoom()
-
     }
-
-
     // 0
     //3 1
     // 2
@@ -158,7 +159,7 @@ object MazeSource {
         }
     }
 
-    private fun addTunnel() {
+    fun addTunnel() {
         val vertical = chance(50)
 
         val length = MathUtils.random(2, tunnelMaxLength)
@@ -181,7 +182,7 @@ object MazeSource {
         stamp(tunnel, 1, 1, mazeX - 1, mazeY - 1)
     }
 
-    private fun addRoom() {
+    fun addRoom() {
         val width = MathUtils.random(2, roomMixSize)
         val height = MathUtils.random(2, roomMixSize)
 
