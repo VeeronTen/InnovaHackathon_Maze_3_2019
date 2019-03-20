@@ -33,8 +33,8 @@ object MazeSource {
             generateWays(it.first, it.second)
         }
 
-        for (i in 0 until tunnelsCount) addTunnel()
-        for (i in 0 until roomsCount) addRoom()
+//        for (i in 0 until tunnelsCount) addTunnel()
+//        for (i in 0 until roomsCount) addRoom()
 
     }
 
@@ -202,13 +202,13 @@ object MazeSource {
         val sizeX = structure[0].size
         val sizeY = structure.size
 
-        for (y in 0 until sizeY) {
-            for (x in 0 until sizeX) {
-                print(structure[y][x])
-            }
-            println()
-        }
-        println()
+//        for (y in 0 until sizeY) {
+//            for (x in 0 until sizeX) {
+//                print(structure[y][x])
+//            }
+//            println()
+//        }
+//        println()
 
         val fromX = MathUtils.random(minX, maxX - sizeX)
         val fromY = MathUtils.random(minY, maxY - sizeY)
