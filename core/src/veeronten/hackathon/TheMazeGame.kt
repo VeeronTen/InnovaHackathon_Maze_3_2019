@@ -26,6 +26,7 @@ class TheMazeGame : Game() {
     lateinit var knownFloor: Texture
     lateinit var inputMultiplexer: InputMultiplexer
     lateinit var stragglerImg: Texture
+    lateinit var targetImg: Texture
 
     override fun create() {
         camera = OrthographicCamera()
@@ -37,6 +38,7 @@ class TheMazeGame : Game() {
         wallInvisible = Texture("wall_invisible.jpg")
         knownFloor = Texture("known_floor.jpg")
         stragglerImg = Texture("hero.png")
+        targetImg = Texture("target.png")
 
         inputMultiplexer = InputMultiplexer()
         inputMultiplexer.addProcessor(DesktopInputProcessor(camera))

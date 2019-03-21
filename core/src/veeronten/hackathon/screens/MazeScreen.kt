@@ -53,12 +53,16 @@ class MazeScreen(val game: TheMazeGame) : Screen {
 
                 game.batch.drawByCoord(game.stragglerImg, straggler.logicX, straggler.logicY)
 
+                straggler.targets.forEach {
+                    game.batch.drawByCoord(game.targetImg, it.first, it.second)
+                }
+
             }
         }
         game.batch.end()
         stage.draw()
 
-//        straggler.timeGone(delta)
+        straggler.timeGone(delta)
     }
 
     override fun dispose() {
