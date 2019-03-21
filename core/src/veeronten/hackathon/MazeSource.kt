@@ -5,7 +5,9 @@ import ktx.collections.GdxArray
 import ktx.collections.gdxArrayOf
 
 const val EMPTY: Int = 0
-const val WALL: Int = 1
+const val WALL_VISIBLE: Int = 1
+const val WALL_INVISIBLEE: Int = 2
+const val KNOWN_FLOOR: Int = 3
 
 //todo bug могут появляться нетронутые участки стен
 
@@ -13,7 +15,7 @@ object MazeSource {
 
     private var tunnelMaxLength = 10
 
-    private val roomMixSize = 8
+    private val roomMaxSize = 8
 
     var mazeArray = GdxArray<GdxArray<Int>>()
 
@@ -24,7 +26,7 @@ object MazeSource {
     private val startPoints = GdxArray<Pair<Int, Int>>()
 
     init {
-        generate(mazeX, mazeY)
+//        generate(mazeX, mazeY)
     }
 
 
@@ -117,30 +119,22 @@ object MazeSource {
             var x = MathUtils.random(0, max)
             if (up) {
                 x--
-                if (x == -1) {
-                    return 0
-                }
+                if (x == -1) return 0
             }
 
             if (right) {
                 x--
-                if (x == -1) {
-                    return 1
-                }
+                if (x == -1) return 1
             }
 
             if (down) {
                 x--
-                if (x == -1) {
-                    return 2
-                }
+                if (x == -1) return 2
             }
 
             if (left) {
                 x--
-                if (x == -1) {
-                    return 3
-                }
+                if (x == -1) return 3
             }
 
         }
@@ -153,7 +147,7 @@ object MazeSource {
         for (y in 0 until mazeY) {
             val line = gdxArrayOf<Int>()
             for (x in 0 until mazeX) {
-                line.add(WALL)
+                line.add(WALL_VISIBLE)
             }
             mazeArray.add(line)
         }
@@ -183,8 +177,8 @@ object MazeSource {
     }
 
     fun addRoom() {
-        val width = MathUtils.random(2, roomMixSize)
-        val height = MathUtils.random(2, roomMixSize)
+        val width = MathUtils.random(2, roomMaxSize)
+        val height = MathUtils.random(2, roomMaxSize)
 
         val room = GdxArray<GdxArray<Int>>().apply {
             for (y in 0 until height) {
@@ -196,7 +190,7 @@ object MazeSource {
             }
         }
 
-        stamp(room, 1, 1, mazeX - 2, mazeY - 2)
+        stamp(room, 1, 1, mazeX - 1, mazeY - 1)
     }
 
     private fun stamp(structure: GdxArray<GdxArray<Int>>, minX: Int, minY: Int, maxX: Int, maxY: Int) {
