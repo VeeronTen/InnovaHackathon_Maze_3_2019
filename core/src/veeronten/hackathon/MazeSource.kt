@@ -6,7 +6,7 @@ import ktx.collections.gdxArrayOf
 
 const val EMPTY: Int = 0
 const val WALL_VISIBLE: Int = 1
-const val WALL_INVISIBLEE: Int = 2
+const val WALL_INVISIBLE: Int = 2
 const val KNOWN_FLOOR: Int = 3
 
 //todo bug могут появляться нетронутые участки стен
@@ -17,18 +17,12 @@ object MazeSource {
 
     private val roomMaxSize = 8
 
-    var mazeArray = GdxArray<GdxArray<Int>>()
+    private var mazeArray = GdxArray<GdxArray<Int>>()
 
     var mazeX = 50
     var mazeY = 50
 
-    //todo stack
-    private val startPoints = GdxArray<Pair<Int, Int>>()
-
-    init {
-//        generate(mazeX, mazeY)
-    }
-
+    private val startPoints = GdxArray<Point>()
 
     fun generate(width: Int, height: Int) {
         mazeX = width
@@ -37,57 +31,58 @@ object MazeSource {
         startPoints.clear()
         setEmptyMaze()
 
-        startPoints.add(Pair(1, 1))
+        startPoints.add(Point(1, 1))
         startPoints.forEach {
-            generateWays(it.first, it.second)
+            generateWays(it)
         }
     }
-    // 0
-    //3 1
-    // 2
-    private fun generateWays(x: Int, y: Int) {
 
-        var x = x
-        var y = y
+    private fun generateWays(point: Point) {
+
+        var point = point
 
         var up = true
         var right = true
         var down = true
         var left = true
 
-        mazeArray[y][x] = EMPTY
+        setValueByPoint(point, EMPTY)
 
         while (true) {
-            if (x - 1 == 0 || mazeArray[y][x - 1] == EMPTY || squareHaveMoreThan1Way(x - 1, y)) {
+            if (point.x - 1 == 0 || getValueByPoint(point.withDecX()) == EMPTY || pointHaveMoreThan1Way(point.withDecX())) {
                 left = false
             }
-            if (x + 1 == mazeX - 1 || mazeArray[y][x + 1] == EMPTY || squareHaveMoreThan1Way(x + 1, y)) {
+            if (point.x + 1 == mazeX - 1 || getValueByPoint(point.withIncX()) == EMPTY || pointHaveMoreThan1Way(point.withIncX())) {
                 right = false
             }
-            if (y - 1 == 0 || mazeArray[x][y - 1] == EMPTY || squareHaveMoreThan1Way(x, y - 1)) {
+            if (point.y - 1 == 0 || getValueByPoint(point.withDecY()) == EMPTY || pointHaveMoreThan1Way(point.withDecY())) {
                 up = false
             }
-            if (y + 1 == mazeY - 1 || mazeArray[x][y + 1] == EMPTY || squareHaveMoreThan1Way(x, y + 1)) {
+            if (point.y + 1 == mazeY - 1 || getValueByPoint(point.withIncY()) == EMPTY || pointHaveMoreThan1Way(point.withIncY())) {
                 down = false
             }
-
-//            println("       $up")
-//            println("$left      $right")
-//            println("       $down")
 
             val nextMove = generateNextMove(up, right, down, left)
 
             when (nextMove) {
-                0 -> y -= 1
-                1 -> x += 1
-                2 -> y += 1
-                3 -> x -= 1
+                0 -> {
+                    point = point.withDecY()
+                }
+                1 -> {
+                    point = point.withIncX()
+                }
+                2 -> {
+                    point = point.withIncY()
+                }
+                3 -> {
+                    point = point.withDecX()
+                }
                 null -> return
             }
 
-            startPoints.add(Pair(x, y))
+            startPoints.add(point)
 
-            mazeArray[y][x] = EMPTY
+            setValueByPoint(point, EMPTY)
 
             up = true
             right = true
@@ -96,13 +91,13 @@ object MazeSource {
         }
     }
 
-    private fun squareHaveMoreThan1Way(x: Int, y: Int): Boolean {
+    private fun pointHaveMoreThan1Way(point: Point): Boolean {
         var ways = 0
 
-        if (mazeArray[y + 1][x] == EMPTY) ways++
-        if (mazeArray[y - 1][x] == EMPTY) ways++
-        if (mazeArray[y][x + 1] == EMPTY) ways++
-        if (mazeArray[y][x - 1] == EMPTY) ways++
+        if (getValueByPoint(point.withIncY()) == EMPTY) ways++
+        if (getValueByPoint(point.withDecY()) == EMPTY) ways++
+        if (getValueByPoint(point.withIncX()) == EMPTY) ways++
+        if (getValueByPoint(point.withDecX()) == EMPTY) ways++
 
         return ways > 1
     }
@@ -213,5 +208,10 @@ object MazeSource {
                 mazeArray[fromY + y][fromX + x] = structure[y][x]
             }
         }
+    }
+
+    fun getValueByPoint(point: Point): Int = mazeArray[point.y][point.x]
+    fun setValueByPoint(point: Point, value: Int) {
+        mazeArray[point.y][point.x] = value
     }
 }

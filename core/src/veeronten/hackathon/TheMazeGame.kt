@@ -20,7 +20,7 @@ class TheMazeGame : Game() {
     lateinit var camera: OrthographicCamera
     lateinit var batch: SpriteBatch
     lateinit var font: BitmapFont
-    lateinit var music: Music
+    private lateinit var music: Music
     lateinit var wallVisibleImg: Texture
     lateinit var wallInvisible: Texture
     lateinit var knownFloor: Texture

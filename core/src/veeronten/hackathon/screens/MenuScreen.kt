@@ -9,22 +9,22 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import veeronten.hackathon.*
 
 
-class MenuScreen(val game: TheMazeGame) : Screen {
+class MenuScreen(private val game: TheMazeGame) : Screen {
 
-    lateinit var stage: Stage
-    lateinit var group: VerticalGroup
+    private lateinit var stage: Stage
+    private lateinit var group: VerticalGroup
 
-    lateinit var regenerateBtn: TextButton
+    private lateinit var regenerateBtn: TextButton
 //    lateinit var mazeWidthSlider: Slider
 //    lateinit var mazeHeightSlider: Slider
 
-    lateinit var addTunnelBtn: TextButton
+    private lateinit var addTunnelBtn: TextButton
 
-    lateinit var addRoomBtn: TextButton
-    lateinit var startBtn: TextButton
+    private lateinit var addRoomBtn: TextButton
+    private lateinit var startBtn: TextButton
 
 
-    var mazeWidht = MazeSource.mazeX
+    var mazeWidth = MazeSource.mazeX
     var mazeHeight = MazeSource.mazeY
 
     override fun show() {
@@ -36,7 +36,7 @@ class MenuScreen(val game: TheMazeGame) : Screen {
 
         game.inputMultiplexer.addProcessor(stage)
 
-        regenerateBtn = createTextBtn("REGENERATE!") { MazeSource.generate(mazeWidht, mazeHeight) }
+        regenerateBtn = createTextBtn("REGENERATE!") { MazeSource.generate(mazeWidth, mazeHeight) }
 
 
 //        mazeWidthSlider = Slider(5F, 100F, 1F, false, Slider.SliderStyle()).apply {
@@ -65,7 +65,8 @@ class MenuScreen(val game: TheMazeGame) : Screen {
             game.screen = MazeScreen(game)
         }
 
-
+//todo не видит через таргеты
+//todo или не прорисовывается там, где был таргет
 
         stage.addActor(group)
         group.addActor(regenerateBtn)
@@ -73,7 +74,7 @@ class MenuScreen(val game: TheMazeGame) : Screen {
         group.addActor(addRoomBtn)
         group.addActor(startBtn)
 
-        MazeSource.generate(mazeWidht, mazeHeight)
+        MazeSource.generate(mazeWidth, mazeHeight)
     }
 
     override fun render(delta: Float) {
@@ -82,10 +83,11 @@ class MenuScreen(val game: TheMazeGame) : Screen {
         game.camera.update()
         game.batch.projectionMatrix = game.camera.combined
         game.batch.begin()
-        for (i in 0 until MazeSource.mazeArray.size) {
-            for (j in 0 until MazeSource.mazeArray[i].size) {
-                when (MazeSource.mazeArray[i][j]) {
-                    WALL_VISIBLE -> game.batch.drawByCoord(game.wallVisibleImg, j, i)
+        for (y in 0 until MazeSource.mazeY) {
+            for (x in 0 until MazeSource.mazeX) {
+                val point = Point(x, y)
+                when (MazeSource.getValueByPoint(point)) {
+                    WALL_VISIBLE -> game.batch.drawByCoord(game.wallVisibleImg, point)
                 }
             }
         }

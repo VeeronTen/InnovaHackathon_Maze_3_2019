@@ -8,13 +8,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import veeronten.hackathon.*
 
-class MazeScreen(val game: TheMazeGame) : Screen {
+class MazeScreen(private val game: TheMazeGame) : Screen {
 
-    lateinit var stage: Stage
-    lateinit var group: VerticalGroup
-    lateinit var backBtn: TextButton
+    private lateinit var stage: Stage
+    private lateinit var group: VerticalGroup
+    private lateinit var backBtn: TextButton
 
-    lateinit var straggler: Straggler
+    private lateinit var straggler: Straggler
 
     override fun show() {
         stage = Stage()
@@ -42,19 +42,19 @@ class MazeScreen(val game: TheMazeGame) : Screen {
         game.camera.update()
         game.batch.projectionMatrix = game.camera.combined
         game.batch.begin()
-        for (i in 0 until MazeSource.mazeArray.size) {
-            for (j in 0 until MazeSource.mazeArray[i].size) {
-
-                when (MazeSource.mazeArray[i][j]) {
-                    WALL_VISIBLE -> game.batch.drawByCoord(game.wallVisibleImg, j, i)
-                    WALL_INVISIBLEE -> game.batch.drawByCoord(game.wallInvisible, j, i)
-                    KNOWN_FLOOR -> game.batch.drawByCoord(game.knownFloor, j, i)
+        for (y in 0 until MazeSource.mazeY) {
+            for (x in 0 until MazeSource.mazeX) {
+                val point = Point(x, y)
+                when (MazeSource.getValueByPoint(point)) {
+                    WALL_VISIBLE -> game.batch.drawByCoord(game.wallVisibleImg, point)
+                    WALL_INVISIBLE -> game.batch.drawByCoord(game.wallInvisible, point)
+                    KNOWN_FLOOR -> game.batch.drawByCoord(game.knownFloor, point)
                 }
 
-                game.batch.drawByCoord(game.stragglerImg, straggler.logicX, straggler.logicY)
+                game.batch.drawByCoord(game.stragglerImg, straggler.position)
 
-                straggler.targets.forEach {
-                    game.batch.drawByCoord(game.targetImg, it.first, it.second)
+                straggler.targets.forEach { point ->
+                    game.batch.drawByCoord(game.targetImg, point)
                 }
 
             }

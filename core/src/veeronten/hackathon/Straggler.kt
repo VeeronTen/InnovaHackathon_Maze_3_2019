@@ -9,32 +9,29 @@ import kotlin.math.roundToInt
 
 class Straggler {
 
-    var logicX = 0
-    var logicY = 0
+    var position = Point(0, 0)
 
-    private var pointsToWatch = GdxArray<Pair<Int, Int>>()
-    private var visiblePoints = GdxArray<Pair<Int, Int>>()
+    private var pointsToWatch = GdxArray<Point>()
+    private var visiblePoints = GdxArray<Point>()
 
-    var targets = GdxArray<Pair<Int, Int>>()
+    var targets = GdxArray<Point>()
 
-    var path = GdxArray<Pair<Int, Int>>()
+    private var path = GdxArray<Point>()
 
     init {
-        var startX: Int
-        var startY: Int
+        var startPoint: Point
 
         do {
-            startX = MathUtils.random(1, MazeSource.mazeX - 2)
-            startY = MathUtils.random(1, MazeSource.mazeY - 2)
-        } while (MazeSource.mazeArray[startY][startX] != EMPTY)
+            startPoint = Point(MathUtils.random(1, MazeSource.mazeX - 2), MathUtils.random(1, MazeSource.mazeY - 2))
+        } while (MazeSource.getValueByPoint(startPoint) != EMPTY)
 
-        logicX = startX
-        logicY = startY
+        position = startPoint
 
-        for (y in 0 until MazeSource.mazeArray.size) {
-            for (x in 0 until MazeSource.mazeArray[y].size) {
-                if (MazeSource.mazeArray[y][x] == WALL_VISIBLE) {
-                    MazeSource.mazeArray[y][x] = WALL_INVISIBLEE
+        for (y in 0 until MazeSource.mazeY) {
+            for (x in 0 until MazeSource.mazeX) {
+                val point = Point(x, y)
+                if (MazeSource.getValueByPoint(point) == WALL_VISIBLE) {
+                    MazeSource.setValueByPoint(point, WALL_INVISIBLE)
                 }
             }
         }
@@ -44,61 +41,57 @@ class Straggler {
         setTargetPathIfNeed()
     }
 
-    var time: Float = 0F
+    private var timeWaiting: Float = 0F
 
     fun timeGone(timeGone: Float) {
-        time += timeGone
-        if (time > 1) {
-//            logicX = targets.last().first
-//            logicY = targets.last().second
-//            time = 0F
-
+        timeWaiting += timeGone
+        if (timeWaiting > 1) {
             move()
             watch()
             findTargets()
             setTargetPathIfNeed()
-            time = 0F
+            timeWaiting = 0F
         }
     }
 
-    fun watch() {
+    private fun watch() {
         pointsToWatch.clear()
 
-        pointsToWatch.add(Pair(logicX, logicY))
+        pointsToWatch.add(position)
 
-        pointsToWatch.forEach {
-            val x = it.first
-            val y = it.second
+        pointsToWatch.forEach { point ->
 
-            setVisible(x, y)
+            setVisible(point)
 
-            if (MazeSource.mazeArray[y][x] != WALL_VISIBLE) {
-                if (x - 1 != -1 && squareIsVisible(x - 1, y) && MazeSource.mazeArray[y][x - 1] != WALL_VISIBLE && MazeSource.mazeArray[y][x - 1] != KNOWN_FLOOR) {
-                    val pair = Pair(x - 1, y)
-                    if (!visiblePoints.contains(pair)) {
-                        pointsToWatch.add(pair)
-                        visiblePoints.add(pair)
+            if (MazeSource.getValueByPoint(point) != WALL_VISIBLE) {
+
+                val pointWithIncX = point.withIncX()
+                val pointWithIncY = point.withIncY()
+                val pointWithDecX = point.withDecX()
+                val pointWithDecY = point.withDecY()
+
+                if (point.x - 1 != -1 && pointIsVisible(pointWithDecX) && MazeSource.getValueByPoint(pointWithDecX) != WALL_VISIBLE && MazeSource.getValueByPoint(pointWithDecX) != KNOWN_FLOOR) {
+                    if (!visiblePoints.contains(pointWithDecX)) {
+                        pointsToWatch.add(pointWithDecX)
+                        visiblePoints.add(pointWithDecX)
                     }
                 }
-                if (x + 1 != MazeSource.mazeX && squareIsVisible(x + 1, y) && MazeSource.mazeArray[y][x + 1] != WALL_VISIBLE && MazeSource.mazeArray[y][x + 1] != KNOWN_FLOOR) {
-                    val pair = Pair(x + 1, y)
-                    if (!visiblePoints.contains(pair)) {
-                        pointsToWatch.add(pair)
-                        visiblePoints.add(pair)
+                if (point.x + 1 != MazeSource.mazeX && pointIsVisible(pointWithIncX) && MazeSource.getValueByPoint(pointWithIncX) != WALL_VISIBLE && MazeSource.getValueByPoint(pointWithIncX) != KNOWN_FLOOR) {
+                    if (!visiblePoints.contains(pointWithIncX)) {
+                        pointsToWatch.add(pointWithIncX)
+                        visiblePoints.add(pointWithIncX)
                     }
                 }
-                if (y - 1 != -1 && squareIsVisible(x, y - 1) && MazeSource.mazeArray[y - 1][x] != WALL_VISIBLE && MazeSource.mazeArray[y - 1][x] != KNOWN_FLOOR) {
-                    val pair = Pair(x, y - 1)
-                    if (!visiblePoints.contains(pair)) {
-                        pointsToWatch.add(pair)
-                        visiblePoints.add(pair)
+                if (point.y - 1 != -1 && pointIsVisible(pointWithDecY) && MazeSource.getValueByPoint(pointWithDecY) != WALL_VISIBLE && MazeSource.getValueByPoint(pointWithDecY) != KNOWN_FLOOR) {
+                    if (!visiblePoints.contains(pointWithDecY)) {
+                        pointsToWatch.add(pointWithDecY)
+                        visiblePoints.add(pointWithDecY)
                     }
                 }
-                if (y + 1 != MazeSource.mazeY && squareIsVisible(x, y + 1) && MazeSource.mazeArray[y + 1][x] != WALL_VISIBLE && MazeSource.mazeArray[y + 1][x] != KNOWN_FLOOR) {
-                    val pair = Pair(x, y + 1)
-                    if (!visiblePoints.contains(pair)) {
-                        pointsToWatch.add(pair)
-                        visiblePoints.add(pair)
+                if (point.y + 1 != MazeSource.mazeY && pointIsVisible(pointWithIncY) && MazeSource.getValueByPoint(pointWithIncY) != WALL_VISIBLE && MazeSource.getValueByPoint(pointWithIncY) != KNOWN_FLOOR) {
+                    if (!visiblePoints.contains(pointWithIncY)) {
+                        pointsToWatch.add(pointWithIncY)
+                        visiblePoints.add(pointWithIncY)
                     }
                 }
             }
@@ -107,70 +100,66 @@ class Straggler {
         pointsToWatch.clear()
     }
 
-    fun findTargets() {
+    private fun findTargets() {
         targets.clear()
-        visiblePoints.forEach {
-            val x = it.first
-            val y = it.second
+        visiblePoints.forEach { point ->
 
-            if (MazeSource.mazeArray[y][x] != WALL_VISIBLE && MazeSource.mazeArray[y][x] != WALL_INVISIBLEE) {
-                if (x - 1 != -1 && MazeSource.mazeArray[y][x - 1] == EMPTY) {
-                    targets.add(Pair(x - 1, y))
+            if (MazeSource.getValueByPoint(point) != WALL_VISIBLE && MazeSource.getValueByPoint(point) != WALL_INVISIBLE) {
+                if (point.x - 1 != -1 && MazeSource.getValueByPoint(point.withDecX()) == EMPTY) {
+                    targets.add(point.withDecX())
                 }
-                if (x + 1 != MazeSource.mazeX && MazeSource.mazeArray[y][x + 1] == EMPTY) {
-                    targets.add(Pair(x + 1, y))
+                if (point.x + 1 != MazeSource.mazeX && MazeSource.getValueByPoint(point.withIncX()) == EMPTY) {
+                    targets.add(point.withIncX())
                 }
-                if (y - 1 != -1 && MazeSource.mazeArray[y - 1][x] == EMPTY) {
-                    targets.add(Pair(x, y - 1))
+                if (point.y - 1 != -1 && MazeSource.getValueByPoint(point.withDecY()) == EMPTY) {
+                    targets.add(point.withDecY())
                 }
-                if (y + 1 != MazeSource.mazeY && MazeSource.mazeArray[y + 1][x] == EMPTY) {
-                    targets.add(Pair(x, y + 1))
+                if (point.y + 1 != MazeSource.mazeY && MazeSource.getValueByPoint(point.withIncY()) == EMPTY) {
+                    targets.add(point.withIncY())
                 }
             }
         }
     }
 
-    fun squareIsVisible(x: Int, y: Int): Boolean {
-        val N = max(abs(x - logicX), abs(y - logicY))
-        for (step in 0..N) {
-            val t: Float = if (N == 0) 0F else (step.toFloat() / N.toFloat())
+    private fun pointIsVisible(point: Point): Boolean {
+        val n = max(abs(point.x - position.x), abs(point.y - position.y))
+        for (step in 0..n) {
+            val t: Float = if (n == 0) 0F else (step.toFloat() / n.toFloat())
 
-            val x = lerp(logicX.toFloat(), x.toFloat(), t).roundToInt()
-            val y = lerp(logicY.toFloat(), y.toFloat(), t).roundToInt()
+            val point = Point(lerp(position.x.toFloat(), point.x.toFloat(), t).roundToInt(), lerp(position.y.toFloat(), point.y.toFloat(), t).roundToInt())
 
-            if ((MazeSource.mazeArray[y][x] == WALL_VISIBLE || MazeSource.mazeArray[y][x] == WALL_INVISIBLEE) && step != N)
+            if ((MazeSource.getValueByPoint(point) == WALL_VISIBLE || MazeSource.getValueByPoint(point) == WALL_INVISIBLE) && step != n)
                 return false
         }
         return true
     }
 
-    fun setVisible(x: Int, y: Int) {
-        when (MazeSource.mazeArray[y][x]) {
+    private fun setVisible(point: Point) {
+        when (MazeSource.getValueByPoint(point)) {
             EMPTY -> {
-                MazeSource.mazeArray[y][x] = KNOWN_FLOOR
+                MazeSource.setValueByPoint(point, KNOWN_FLOOR)
             }
-            WALL_INVISIBLEE -> {
-                MazeSource.mazeArray[y][x] = WALL_VISIBLE
+            WALL_INVISIBLE -> {
+                MazeSource.setValueByPoint(point, WALL_VISIBLE)
             }
         }
     }
 
-    fun setTargetPathIfNeed() {
+    private fun setTargetPathIfNeed() {
         if (path.isEmpty) {
-            path.addAll(pathToSquare(targets.last().first, targets.last().second))
+            path.addAll(pathToSquare(targets.last()))
         }
     }
 
-    fun move() {
-        logicX = path[0].first
-        logicY = path[0].second
+    private fun move() {
+        position = path[0]
         path.removeIndex(0)
-        targets.removeValue(Pair(logicX, logicY), true)
+        targets.removeValue(position, true)
     }
 
-    fun pathToSquare(targetX: Int, targetY: Int): GdxArray<Pair<Int, Int>> {
-        var result = GdxArray<Pair<Int, Int>>()
-        var waveArray = gdxArrayOf<GdxArray<Int>>().apply {
+    private fun pathToSquare(targetPoint: Point): GdxArray<Point> {
+        val result = GdxArray<Point>()
+        val waveArray = gdxArrayOf<GdxArray<Int>>().apply {
             for (y in 0 until MazeSource.mazeY) {
                 add(gdxArrayOf<Int>().apply {
                     for (x in 0 until MazeSource.mazeX) add(Int.MAX_VALUE)
@@ -179,37 +168,36 @@ class Straggler {
         }
 
         var currentValue = 0
-        var targetX = targetX
-        var targetY = targetY
 
-        waveArray[targetY][targetX] = currentValue
+        waveArray[targetPoint.y][targetPoint.x] = currentValue
 
-        while (waveArray[logicY][logicX] == Int.MAX_VALUE) {
+        while (waveArray[position.y][position.x] == Int.MAX_VALUE) {
             for (yy in 0 until MazeSource.mazeY) {
                 for (xx in 0 until MazeSource.mazeX) {
                     if (waveArray[yy][xx] == currentValue) {
 
+                        val point = Point(xx, yy)
                         if (xx - 1 != -1
-                                && MazeSource.mazeArray[yy][xx - 1] != WALL_VISIBLE
-                                && MazeSource.mazeArray[yy][xx - 1] != WALL_INVISIBLEE
+                                && MazeSource.getValueByPoint(point.withDecX()) != WALL_VISIBLE
+                                && MazeSource.getValueByPoint(point.withDecX()) != WALL_INVISIBLE
                                 && waveArray[yy][xx - 1] > currentValue + 1)
                             waveArray[yy][xx - 1] = currentValue + 1
 
                         if (xx + 1 != MazeSource.mazeX
-                                && MazeSource.mazeArray[yy][xx + 1] != WALL_VISIBLE
-                                && MazeSource.mazeArray[yy][xx + 1] != WALL_INVISIBLEE
+                                && MazeSource.getValueByPoint(point.withIncX()) != WALL_VISIBLE
+                                && MazeSource.getValueByPoint(point.withIncX()) != WALL_INVISIBLE
                                 && waveArray[yy][xx + 1] > currentValue + 1)
                             waveArray[yy][xx + 1] = currentValue + 1
 
                         if (yy - 1 != -1
-                                && MazeSource.mazeArray[yy - 1][xx] != WALL_VISIBLE
-                                && MazeSource.mazeArray[yy - 1][xx] != WALL_INVISIBLEE
+                                && MazeSource.getValueByPoint(point.withDecY()) != WALL_VISIBLE
+                                && MazeSource.getValueByPoint(point.withDecY()) != WALL_INVISIBLE
                                 && waveArray[yy - 1][xx] > currentValue + 1)
                             waveArray[yy - 1][xx] = currentValue + 1
 
                         if (yy + 1 != MazeSource.mazeY
-                                && MazeSource.mazeArray[yy + 1][xx] != WALL_VISIBLE
-                                && MazeSource.mazeArray[yy + 1][xx] != WALL_INVISIBLEE
+                                && MazeSource.getValueByPoint(point.withIncY()) != WALL_VISIBLE
+                                && MazeSource.getValueByPoint(point.withIncY()) != WALL_INVISIBLE
                                 && waveArray[yy + 1][xx] > currentValue + 1)
                             waveArray[yy + 1][xx] = currentValue + 1
                     }
@@ -218,32 +206,31 @@ class Straggler {
             currentValue++
         }
 
-        currentValue = waveArray[logicY][logicX]
+        currentValue = waveArray[position.y][position.x]
 
-        var xToMove = logicX
-        var yToMove = logicY
+        var pointToMove = position
 
-        while (xToMove != targetX || yToMove != targetY) {
+        while (pointToMove != targetPoint) {
             when {
-                waveArray[yToMove + 1][xToMove] < currentValue -> {
-                    currentValue = waveArray[yToMove + 1][xToMove]
-                    result.add(Pair(xToMove, yToMove + 1))
-                    yToMove++
+                waveArray[pointToMove.y + 1][pointToMove.x] < currentValue -> {
+                    currentValue = waveArray[pointToMove.y + 1][pointToMove.x]
+                    result.add(pointToMove.withIncY())
+                    pointToMove = pointToMove.withIncY()
                 }
-                waveArray[yToMove - 1][xToMove] < currentValue -> {
-                    currentValue = waveArray[yToMove - 1][xToMove]
-                    result.add(Pair(xToMove, yToMove - 1))
-                    yToMove--
+                waveArray[pointToMove.y - 1][pointToMove.x] < currentValue -> {
+                    currentValue = waveArray[pointToMove.y - 1][pointToMove.x]
+                    result.add(pointToMove.withDecY())
+                    pointToMove = pointToMove.withDecY()
                 }
-                waveArray[yToMove][xToMove - 1] < currentValue -> {
-                    currentValue = waveArray[yToMove][xToMove - 1]
-                    result.add(Pair(xToMove - 1, yToMove))
-                    xToMove--
+                waveArray[pointToMove.y][pointToMove.x - 1] < currentValue -> {
+                    currentValue = waveArray[pointToMove.y][pointToMove.x - 1]
+                    result.add(pointToMove.withDecX())
+                    pointToMove = pointToMove.withDecX()
                 }
-                waveArray[yToMove][xToMove + 1] < currentValue -> {
-                    currentValue = waveArray[yToMove][xToMove + 1]
-                    result.add(Pair(xToMove + 1, yToMove))
-                    xToMove++
+                waveArray[pointToMove.y][pointToMove.x + 1] < currentValue -> {
+                    currentValue = waveArray[pointToMove.y][pointToMove.x + 1]
+                    result.add(pointToMove.withIncX())
+                    pointToMove = pointToMove.withIncX()
                 }
             }
         }
