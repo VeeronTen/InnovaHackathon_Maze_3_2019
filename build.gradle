@@ -52,9 +52,7 @@ project(":desktop") {
         implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
         implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
-        implementation "io.github.libktx:ktx-app:$ktxVersion"
-        implementation "io.github.libktx:ktx-graphics:$ktxVersion"
-        implementation "io.github.libktx:ktx-collections:$ktxVersion"
+        implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
     }
 }
 
@@ -90,9 +88,8 @@ project(":core") {
         implementation "com.badlogicgames.gdx:gdx-ai:$aiVersion"
         implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
-        implementation "io.github.libktx:ktx-app:$ktxVersion"
-        implementation "io.github.libktx:ktx-graphics:$ktxVersion"
         implementation "io.github.libktx:ktx-collections:$ktxVersion"
+        implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     }
 }
 

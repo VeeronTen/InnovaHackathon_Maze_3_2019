@@ -3,10 +3,14 @@ package veeronten.hackathon.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import veeronten.hackathon.*
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 
 
 class MenuScreen(private val game: TheMazeGame) : Screen {
@@ -15,14 +19,28 @@ class MenuScreen(private val game: TheMazeGame) : Screen {
     private lateinit var group: VerticalGroup
 
     private lateinit var regenerateBtn: TextButton
-//    lateinit var mazeWidthSlider: Slider
-//    lateinit var mazeHeightSlider: Slider
+    lateinit var mazeWidthSlider: Slider
+    lateinit var mazeHeightSlider: Slider
 
     private lateinit var addTunnelBtn: TextButton
 
     private lateinit var addRoomBtn: TextButton
     private lateinit var startBtn: TextButton
 
+    //todo fix font
+    private val skin = Skin().apply {
+        addRegions(TextureAtlas(Gdx.files.internal("uiskin.atlas")))
+
+        val generator = FreeTypeFontGenerator(Gdx.files.internal("default.ttf"))
+        val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
+        parameter.size = 60
+        val font12 = generator.generateFont(parameter)
+
+        generator.dispose()
+
+        add("default-font", font12)
+        load(Gdx.files.internal("uiskin.json"))
+    }
 
     var mazeWidth = MazeSource.mazeX
     var mazeHeight = MazeSource.mazeY
@@ -39,19 +57,19 @@ class MenuScreen(private val game: TheMazeGame) : Screen {
         regenerateBtn = createTextBtn("REGENERATE!") { MazeSource.generate(mazeWidth, mazeHeight) }
 
 
-//        mazeWidthSlider = Slider(5F, 100F, 1F, false, Slider.SliderStyle()).apply {
-//            addListener {
-//                mazeWidht = mazeWidthSlider.value.toInt()
-//                return@addListener true
-//            }
-//        }
-//        //todo починить слайдеры
-//        mazeHeightSlider = Slider(5F, 100F, 1F, false, Slider.SliderStyle()).apply {
-//            addListener {
-//                mazeHeight = mazeHeightSlider.value.toInt()
-//                return@addListener true
-//            }
-//        }
+        mazeWidthSlider = Slider(5F, 100F, 1F, false, skin).apply {
+            addListener {
+                mazeWidth = mazeWidthSlider.value.toInt()
+                return@addListener false
+            }
+        }
+        //todo починить слайдеры
+        mazeHeightSlider = Slider(5F, 100F, 1F, false, skin).apply {
+            addListener {
+                mazeHeight = mazeHeightSlider.value.toInt()
+                return@addListener false
+            }
+        }
 
         addTunnelBtn = createTextBtn("ADD TUNNEL!") { MazeSource.addTunnel() }
 
@@ -70,6 +88,8 @@ class MenuScreen(private val game: TheMazeGame) : Screen {
 
         stage.addActor(group)
         group.addActor(regenerateBtn)
+        group.addActor(mazeHeightSlider)
+        group.addActor(mazeWidthSlider)
         group.addActor(addTunnelBtn)
         group.addActor(addRoomBtn)
         group.addActor(startBtn)
