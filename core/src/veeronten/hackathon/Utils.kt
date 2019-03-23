@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 
@@ -21,6 +23,13 @@ fun createTextBtn(text: String, onClick: () -> Unit) =
                 }
             })
         }
+//todo add def value?
+fun createSlider(min: Int, max:Int, skin: Skin, onClick: (Int) -> Unit) = Slider(min.toFloat(), max.toFloat(), 1F, false, skin).apply {
+    addListener {
+        onClick.invoke(value.toInt())
+        return@addListener false
+    }
+}
 
 fun Batch.drawByCoord(img: Texture, point: Point) = draw(img, TILE_SIZE.toFloat() * point.x, HEIGHT - TILE_SIZE.toFloat() * (point.y + 1), TILE_SIZE.toFloat(), TILE_SIZE.toFloat())
 

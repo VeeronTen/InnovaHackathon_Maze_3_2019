@@ -3,82 +3,111 @@ package veeronten.hackathon.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.scenes.scene2d.ui.Slider
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import veeronten.hackathon.*
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-
 
 class MenuScreen(private val game: TheMazeGame) : Screen {
 
     private lateinit var stage: Stage
-    private lateinit var group: VerticalGroup
+    private lateinit var rootGroup: VerticalGroup
 
+    private lateinit var mazeWidthLabel: Label
+    private lateinit var mazeWidthSlider: Slider
+    private lateinit var mazeHeightLabel: Label
+    private lateinit var mazeHeightSlider: Slider
     private lateinit var regenerateBtn: TextButton
-    lateinit var mazeWidthSlider: Slider
-    lateinit var mazeHeightSlider: Slider
 
+    private lateinit var emptyLine1: Label
+
+    private lateinit var tunnelLengthLabel: Label
+    private lateinit var tunnelLengthSlider: Slider
     private lateinit var addTunnelBtn: TextButton
 
+    private lateinit var emptyLine2: Label
+
+    private lateinit var roomWidthLabel: Label
+    private lateinit var roomWidthSlider: Slider
+    private lateinit var roomHeightLabel: Label
+    private lateinit var roomHeightSlider: Slider
     private lateinit var addRoomBtn: TextButton
+
+    private lateinit var emptyLine3: Label
+
+    private lateinit var addExit: TextButton
+
+    private lateinit var emptyLine4: Label
+
     private lateinit var startBtn: TextButton
 
-    //todo fix font
     private val skin = Skin().apply {
         addRegions(TextureAtlas(Gdx.files.internal("uiskin.atlas")))
-
-        val generator = FreeTypeFontGenerator(Gdx.files.internal("default.ttf"))
-        val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
-        parameter.size = 60
-        val font12 = generator.generateFont(parameter)
-
-        generator.dispose()
-
-        add("default-font", font12)
+        add("default-font", BitmapFont())
         load(Gdx.files.internal("uiskin.json"))
     }
-
-    var mazeWidth = MazeSource.mazeX
-    var mazeHeight = MazeSource.mazeY
-
+    //todo при старте смотреть на центр лабиринта, эффектная картинка
     override fun show() {
         stage = Stage()
-        group = VerticalGroup()
-
-        group.setBounds(WIDTH.toFloat() - 100, 0F, WIDTH.toFloat(), HEIGHT.toFloat())
-        group.width = 50F
+        rootGroup = VerticalGroup().apply {
+            setBounds(WIDTH.toFloat() - 100, 0F, WIDTH.toFloat(), HEIGHT.toFloat())
+            width = 50F
+        }
 
         game.inputMultiplexer.addProcessor(stage)
 
-        regenerateBtn = createTextBtn("REGENERATE!") { MazeSource.generate(mazeWidth, mazeHeight) }
+        emptyLine1 = Label("\n", skin)
+        emptyLine2 = Label("\n", skin)
+        emptyLine3 = Label("\n", skin)
+        emptyLine4 = Label("\n", skin)
 
 
-        mazeWidthSlider = Slider(5F, 100F, 1F, false, skin).apply {
-            addListener {
-                mazeWidth = mazeWidthSlider.value.toInt()
-                return@addListener false
-            }
+
+
+        MazeSource.generate(mazeWidthDefault(), mazeHeightDefault())
+
+        mazeWidthLabel = Label("Maze width = ${mazeWidthDefault()}", skin)
+        mazeWidthSlider = createSlider(MazeSource.configMazeMinSize, MazeSource.configMazeMaxSize, skin) { mazeWidthLabel.setText("Maze width = $it") }
+        mazeHeightLabel = Label("Maze height = ${mazeHeightDefault()}", skin)
+        mazeHeightSlider = createSlider(MazeSource.configMazeMinSize, MazeSource.configMazeMaxSize, skin) { mazeHeightLabel.setText("Maze height = $it") }
+        regenerateBtn = createTextBtn("[REGENERATE]") {
+            MazeSource.generate(mazeWidthSlider.value.toInt(), mazeHeightSlider.value.toInt())
+
+            tunnelLengthLabel.setText("Tunnel length is ${tunnelLengthDefault()}")
+            tunnelLengthSlider.value = tunnelLengthDefault().toFloat()
+            tunnelLengthSlider.setRange(MazeSource.configTunnelMinLength.toFloat(), MazeSource.configStructureMaxSize.toFloat())
+            tunnelLengthSlider.value = tunnelLengthDefault().toFloat()
+
+            roomWidthLabel.setText("Room width = ${roomWidthDefault()}")
+            roomHeightLabel.setText("Room height = ${roomWidthDefault()}")
+            roomWidthSlider.value = roomWidthDefault().toFloat()
+            roomHeightSlider.value = roomHeightDefault().toFloat()
+            roomWidthSlider.setRange(MazeSource.configRoomMinSize.toFloat(), MazeSource.configStructureMaxSize.toFloat())
+            roomHeightSlider.setRange(MazeSource.configRoomMinSize.toFloat(), MazeSource.configStructureMaxSize.toFloat())
+            roomWidthSlider.value = roomWidthDefault().toFloat()
+            roomHeightSlider.value = roomHeightDefault().toFloat()
         }
-        //todo починить слайдеры
-        mazeHeightSlider = Slider(5F, 100F, 1F, false, skin).apply {
-            addListener {
-                mazeHeight = mazeHeightSlider.value.toInt()
-                return@addListener false
-            }
-        }
+        mazeWidthSlider.value = mazeWidthDefault().toFloat()
+        mazeHeightSlider.value = mazeHeightDefault().toFloat()
 
-        addTunnelBtn = createTextBtn("ADD TUNNEL!") { MazeSource.addTunnel() }
+        tunnelLengthLabel = Label("Tunnel length is ${tunnelLengthDefault()}", skin)
+        tunnelLengthSlider = createSlider(MazeSource.configTunnelMinLength, MazeSource.configStructureMaxSize, skin) { tunnelLengthLabel.setText("Tunnel length is $it") }
+        addTunnelBtn = createTextBtn("[ADD TUNNEL]") { MazeSource.addTunnel(tunnelLengthSlider.value.toInt()) }
+        tunnelLengthSlider.value = tunnelLengthDefault().toFloat()
 
-//        tunnelMinLengthSlider = Slider(2, m)
+        roomWidthLabel = Label("Room width = ${roomWidthDefault()}", skin)
+        roomWidthSlider = createSlider(MazeSource.configRoomMinSize, MazeSource.configStructureMaxSize, skin) { roomWidthLabel.setText("Room width = $it")}
+        roomHeightLabel = Label("Room height = ${roomHeightDefault()}", skin)
+        roomHeightSlider = createSlider(MazeSource.configRoomMinSize, MazeSource.configStructureMaxSize, skin) { roomHeightLabel.setText("Room height = $it")}
+        addRoomBtn = createTextBtn("[ADD ROOM]") { MazeSource.addRoom(roomWidthSlider.value.toInt(), roomHeightSlider.value.toInt()) }
+        roomWidthSlider.value = roomWidthDefault().toFloat()
+        roomHeightSlider.value = roomHeightDefault().toFloat()
 
 
-        addRoomBtn = createTextBtn("ADD ROOM!") { MazeSource.addRoom() }
+        addExit = createTextBtn("[ADD EXIT]") {}
 
-        startBtn = createTextBtn("START") {
+        startBtn = createTextBtn("[START]") {
             game.inputMultiplexer.removeProcessor(stage)
             game.screen = MazeScreen(game)
         }
@@ -86,16 +115,44 @@ class MenuScreen(private val game: TheMazeGame) : Screen {
 //todo не видит через таргеты
 //todo или не прорисовывается там, где был таргет
 
-        stage.addActor(group)
-        group.addActor(regenerateBtn)
-        group.addActor(mazeHeightSlider)
-        group.addActor(mazeWidthSlider)
-        group.addActor(addTunnelBtn)
-        group.addActor(addRoomBtn)
-        group.addActor(startBtn)
+        stage.addActor(rootGroup)
 
-        MazeSource.generate(mazeWidth, mazeHeight)
+        rootGroup.apply {
+            addActor(mazeWidthLabel)
+            addActor(mazeWidthSlider)
+            addActor(mazeHeightLabel)
+            addActor(mazeHeightSlider)
+            addActor(regenerateBtn)
+
+            addActor(emptyLine1)
+
+            addActor(tunnelLengthLabel)
+            addActor(tunnelLengthSlider)
+            addActor(addTunnelBtn)
+
+            addActor(emptyLine2)
+
+            addActor(roomWidthLabel)
+            addActor(roomWidthSlider)
+            addActor(roomHeightLabel)
+            addActor(roomHeightSlider)
+            addActor(addRoomBtn)
+
+            addActor(emptyLine3)
+
+            addActor(addExit)
+
+            addActor(emptyLine4)
+
+            addActor(startBtn)
+        }
     }
+
+    private fun mazeWidthDefault() = (MazeSource.configMazeMinSize + MazeSource.configMazeMaxSize) / 2
+    private fun mazeHeightDefault() = mazeWidthDefault()
+    private fun tunnelLengthDefault() = (MazeSource.configTunnelMinLength + MazeSource.configStructureMaxSize) / 2
+    private fun roomWidthDefault() = (MazeSource.configRoomMinSize + MazeSource.configStructureMaxSize) / 2
+    private fun roomHeightDefault() = roomWidthDefault()
 
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)

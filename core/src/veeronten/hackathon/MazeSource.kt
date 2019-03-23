@@ -3,6 +3,7 @@ package veeronten.hackathon
 import com.badlogic.gdx.math.MathUtils
 import ktx.collections.GdxArray
 import ktx.collections.gdxArrayOf
+import kotlin.math.min
 
 const val EMPTY: Int = 0
 const val WALL_VISIBLE: Int = 1
@@ -13,9 +14,11 @@ const val KNOWN_FLOOR: Int = 3
 
 object MazeSource {
 
-    private var tunnelMaxLength = 10
-
-    private val roomMaxSize = 8
+    val configMazeMinSize = 4
+    val configMazeMaxSize = 300
+    var configStructureMaxSize = configMazeMaxSize - 2
+    val configTunnelMinLength = 2
+    val configRoomMinSize = 2
 
     private var mazeArray = GdxArray<GdxArray<Int>>()
 
@@ -27,6 +30,8 @@ object MazeSource {
     fun generate(width: Int, height: Int) {
         mazeX = width
         mazeY = height
+
+        configStructureMaxSize = min(width, height) - 2
 
         startPoints.clear()
         setEmptyMaze()
@@ -148,10 +153,8 @@ object MazeSource {
         }
     }
 
-    fun addTunnel() {
+    fun addTunnel(length: Int) {
         val vertical = chance(50)
-
-        val length = MathUtils.random(2, tunnelMaxLength)
 
         val tunnel = GdxArray<GdxArray<Int>>().apply {
             if (vertical) {
@@ -171,9 +174,7 @@ object MazeSource {
         stamp(tunnel, 1, 1, mazeX - 1, mazeY - 1)
     }
 
-    fun addRoom() {
-        val width = MathUtils.random(2, roomMaxSize)
-        val height = MathUtils.random(2, roomMaxSize)
+    fun addRoom(width: Int, height: Int) {
 
         val room = GdxArray<GdxArray<Int>>().apply {
             for (y in 0 until height) {

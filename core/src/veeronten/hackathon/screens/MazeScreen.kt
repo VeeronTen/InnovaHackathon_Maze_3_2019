@@ -25,7 +25,7 @@ class MazeScreen(private val game: TheMazeGame) : Screen {
 
         game.inputMultiplexer.addProcessor(stage)
 
-        backBtn = createTextBtn("BACK") {
+        backBtn = createTextBtn("[BACK]") {
             game.inputMultiplexer.removeProcessor(stage)
             game.screen = MenuScreen(game)
         }
