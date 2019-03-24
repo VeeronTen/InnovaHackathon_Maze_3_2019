@@ -23,12 +23,13 @@ fun createTextBtn(text: String, onClick: () -> Unit) =
                 }
             })
         }
-//todo add def value?
-fun createSlider(min: Int, max:Int, skin: Skin, onClick: (Int) -> Unit) = Slider(min.toFloat(), max.toFloat(), 1F, false, skin).apply {
+
+fun createSlider(min: Float, max:Float, defValue: Float, step: Float, skin: Skin, onClick: (Float) -> Unit) = Slider(min, max, step, false, skin).apply {
     addListener {
-        onClick.invoke(value.toInt())
+        onClick.invoke(value)
         return@addListener false
     }
+    value = defValue
 }
 
 fun Batch.drawByCoord(img: Texture, point: Point) = draw(img, TILE_SIZE * point.x, HEIGHT - TILE_SIZE * (point.y + 1), TILE_SIZE, TILE_SIZE)

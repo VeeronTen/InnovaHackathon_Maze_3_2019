@@ -11,6 +11,9 @@ class Straggler {
 
     var position = Point(0, 0)
 
+    private var timeWaiting: Float = 0F
+    var waitTillMove: Float = 1F
+
     private var pointsToWatch = GdxArray<Point>()
     private var visiblePoints = GdxArray<Point>()
 
@@ -41,11 +44,9 @@ class Straggler {
         setTargetPathIfNeed()
     }
 
-    private var timeWaiting: Float = 0F
-
     fun timeGone(timeGone: Float) {
         timeWaiting += timeGone
-        if (timeWaiting > 1) {
+        if (timeWaiting > waitTillMove) {
             move()
             watch()
             findTargets()

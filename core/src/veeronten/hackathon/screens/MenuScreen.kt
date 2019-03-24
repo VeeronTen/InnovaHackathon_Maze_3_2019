@@ -68,9 +68,9 @@ class MenuScreen(private val game: TheMazeGame) : Screen {
         MazeSource.generate(mazeWidthDefault(), mazeHeightDefault())
 
         mazeWidthLabel = Label("Maze width = ${mazeWidthDefault()}", skin)
-        mazeWidthSlider = createSlider(MazeSource.configMazeMinSize, MazeSource.configMazeMaxSize, skin) { mazeWidthLabel.setText("Maze width = $it") }
+        mazeWidthSlider = createSlider(MazeSource.configMazeMinSize.toFloat(), MazeSource.configMazeMaxSize.toFloat(), mazeWidthDefault().toFloat(), 1F, skin) { mazeWidthLabel.setText("Maze width = ${it.toInt()}") }
         mazeHeightLabel = Label("Maze height = ${mazeHeightDefault()}", skin)
-        mazeHeightSlider = createSlider(MazeSource.configMazeMinSize, MazeSource.configMazeMaxSize, skin) { mazeHeightLabel.setText("Maze height = $it") }
+        mazeHeightSlider = createSlider(MazeSource.configMazeMinSize.toFloat(), MazeSource.configMazeMaxSize.toFloat(), mazeHeightDefault().toFloat(), 1F, skin) { mazeHeightLabel.setText("Maze height = ${it.toInt()}") }
         regenerateBtn = createTextBtn("[REGENERATE]") {
             MazeSource.generate(mazeWidthSlider.value.toInt(), mazeHeightSlider.value.toInt())
 
@@ -88,21 +88,16 @@ class MenuScreen(private val game: TheMazeGame) : Screen {
             roomWidthSlider.value = roomWidthDefault().toFloat()
             roomHeightSlider.value = roomHeightDefault().toFloat()
         }
-        mazeWidthSlider.value = mazeWidthDefault().toFloat()
-        mazeHeightSlider.value = mazeHeightDefault().toFloat()
 
         tunnelLengthLabel = Label("Tunnel length is ${tunnelLengthDefault()}", skin)
-        tunnelLengthSlider = createSlider(MazeSource.configTunnelMinLength, MazeSource.configStructureMaxSize, skin) { tunnelLengthLabel.setText("Tunnel length is $it") }
+        tunnelLengthSlider = createSlider(MazeSource.configTunnelMinLength.toFloat(), MazeSource.configStructureMaxSize.toFloat(), tunnelLengthDefault().toFloat(), 1F, skin) { tunnelLengthLabel.setText("Tunnel length is ${it.toInt()}") }
         addTunnelBtn = createTextBtn("[ADD TUNNEL]") { MazeSource.addTunnel(tunnelLengthSlider.value.toInt()) }
-        tunnelLengthSlider.value = tunnelLengthDefault().toFloat()
 
         roomWidthLabel = Label("Room width = ${roomWidthDefault()}", skin)
-        roomWidthSlider = createSlider(MazeSource.configRoomMinSize, MazeSource.configStructureMaxSize, skin) { roomWidthLabel.setText("Room width = $it")}
+        roomWidthSlider = createSlider(MazeSource.configRoomMinSize.toFloat(), MazeSource.configStructureMaxSize.toFloat(), roomWidthDefault().toFloat(), 1F, skin) { roomWidthLabel.setText("Room width = ${it.toInt()}")}
         roomHeightLabel = Label("Room height = ${roomHeightDefault()}", skin)
-        roomHeightSlider = createSlider(MazeSource.configRoomMinSize, MazeSource.configStructureMaxSize, skin) { roomHeightLabel.setText("Room height = $it")}
+        roomHeightSlider = createSlider(MazeSource.configRoomMinSize.toFloat(), MazeSource.configStructureMaxSize.toFloat(), roomHeightDefault().toFloat(), 1F, skin) { roomHeightLabel.setText("Room height = ${it.toInt()}")}
         addRoomBtn = createTextBtn("[ADD ROOM]") { MazeSource.addRoom(roomWidthSlider.value.toInt(), roomHeightSlider.value.toInt()) }
-        roomWidthSlider.value = roomWidthDefault().toFloat()
-        roomHeightSlider.value = roomHeightDefault().toFloat()
 
 
         addExit = createTextBtn("[ADD EXIT]") { MazeSource.addExit() }
@@ -112,10 +107,10 @@ class MenuScreen(private val game: TheMazeGame) : Screen {
             game.screen = MazeScreen(game)
         }
 //todo добавить комнату с колоннами и круги
-//todo скорость персонажа
 //todo оптимизация
 //todo концовка
 //todo графика
+//todo камера двигается при работе с ползунками
 
         stage.addActor(rootGroup)
 
