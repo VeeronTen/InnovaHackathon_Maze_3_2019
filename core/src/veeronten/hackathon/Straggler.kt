@@ -55,7 +55,11 @@ class Straggler {
     }
 
     private fun watch() {
+        val oldVisible = GdxArray<Point>()
+        oldVisible.addAll(visiblePoints)
+
         pointsToWatch.clear()
+        visiblePoints.clear()
 
         pointsToWatch.add(position)
 
@@ -70,25 +74,25 @@ class Straggler {
                 val pointWithDecX = point.withDecX()
                 val pointWithDecY = point.withDecY()
 
-                if (point.x - 1 != -1 && pointIsVisible(pointWithDecX) && MazeSource.getValueByPoint(pointWithDecX) != WALL_VISIBLE && MazeSource.getValueByPoint(pointWithDecX) != KNOWN_FLOOR) {
+                if (point.x - 1 != -1 && pointIsVisible(pointWithDecX) && MazeSource.getValueByPoint(pointWithDecX) != WALL_VISIBLE) {
                     if (!visiblePoints.contains(pointWithDecX)) {
                         pointsToWatch.add(pointWithDecX)
                         visiblePoints.add(pointWithDecX)
                     }
                 }
-                if (point.x + 1 != MazeSource.mazeX && pointIsVisible(pointWithIncX) && MazeSource.getValueByPoint(pointWithIncX) != WALL_VISIBLE && MazeSource.getValueByPoint(pointWithIncX) != KNOWN_FLOOR) {
+                if (point.x + 1 != MazeSource.mazeX && pointIsVisible(pointWithIncX) && MazeSource.getValueByPoint(pointWithIncX) != WALL_VISIBLE) {
                     if (!visiblePoints.contains(pointWithIncX)) {
                         pointsToWatch.add(pointWithIncX)
                         visiblePoints.add(pointWithIncX)
                     }
                 }
-                if (point.y - 1 != -1 && pointIsVisible(pointWithDecY) && MazeSource.getValueByPoint(pointWithDecY) != WALL_VISIBLE && MazeSource.getValueByPoint(pointWithDecY) != KNOWN_FLOOR) {
+                if (point.y - 1 != -1 && pointIsVisible(pointWithDecY) && MazeSource.getValueByPoint(pointWithDecY) != WALL_VISIBLE) {
                     if (!visiblePoints.contains(pointWithDecY)) {
                         pointsToWatch.add(pointWithDecY)
                         visiblePoints.add(pointWithDecY)
                     }
                 }
-                if (point.y + 1 != MazeSource.mazeY && pointIsVisible(pointWithIncY) && MazeSource.getValueByPoint(pointWithIncY) != WALL_VISIBLE && MazeSource.getValueByPoint(pointWithIncY) != KNOWN_FLOOR) {
+                if (point.y + 1 != MazeSource.mazeY && pointIsVisible(pointWithIncY) && MazeSource.getValueByPoint(pointWithIncY) != WALL_VISIBLE) {
                     if (!visiblePoints.contains(pointWithIncY)) {
                         pointsToWatch.add(pointWithIncY)
                         visiblePoints.add(pointWithIncY)
@@ -97,6 +101,11 @@ class Straggler {
             }
         }
 
+        visiblePoints.forEach {
+            if (!oldVisible.contains(it)) oldVisible.add(it)
+        }
+        visiblePoints.clear()
+        visiblePoints.addAll(oldVisible)
         pointsToWatch.clear()
     }
 
@@ -146,7 +155,8 @@ class Straggler {
     }
 
     private fun setTargetPathIfNeed() {
-        if (path.isEmpty) {
+        if (path.isEmpty || !targets.contains(path.last())) {
+            path.clear()
             path.addAll(pathToSquare(targets.last()))
         }
     }

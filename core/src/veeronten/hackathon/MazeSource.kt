@@ -10,8 +10,6 @@ const val WALL_VISIBLE: Int = 1
 const val WALL_INVISIBLE: Int = 2
 const val KNOWN_FLOOR: Int = 3
 
-//todo bug могут появляться нетронутые участки стен
-
 object MazeSource {
 
     val configMazeMinSize = 4
@@ -214,7 +212,6 @@ object MazeSource {
         }
     }
 
-//todo добавление выхода, когда невозможно
     fun addExit() {
 
         var stepsTillAdd = MathUtils.random(1, mazeY + mazeY)

@@ -116,8 +116,6 @@ class MenuScreen(private val game: TheMazeGame) : Screen {
 //todo оптимизация
 //todo концовка
 //todo графика
-//todo не видит через таргеты
-//todo или не прорисовывается там, где был таргет
 
         stage.addActor(rootGroup)
 

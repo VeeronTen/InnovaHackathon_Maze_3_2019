@@ -34,5 +34,3 @@ fun createSlider(min: Int, max:Int, skin: Skin, onClick: (Int) -> Unit) = Slider
 fun Batch.drawByCoord(img: Texture, point: Point) = draw(img, TILE_SIZE.toFloat() * point.x, HEIGHT - TILE_SIZE.toFloat() * (point.y + 1), TILE_SIZE.toFloat(), TILE_SIZE.toFloat())
 
 fun lerp(start: Float, end: Float, t: Float) = start + t * (end - start)
-
-//todo переставать идти, если таргет пропал?
