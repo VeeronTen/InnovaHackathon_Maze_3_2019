@@ -51,7 +51,7 @@ class MenuScreen(private val game: TheMazeGame) : Screen {
     override fun show() {
         stage = Stage()
         rootGroup = VerticalGroup().apply {
-            setBounds(WIDTH.toFloat() - 100, 0F, WIDTH.toFloat(), HEIGHT.toFloat())
+            setBounds(WIDTH - 100, 0F, WIDTH, HEIGHT)
             width = 50F
         }
 

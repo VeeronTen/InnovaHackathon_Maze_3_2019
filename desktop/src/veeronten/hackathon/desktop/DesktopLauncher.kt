@@ -11,8 +11,8 @@ object DesktopLauncher {
     @JvmStatic
     fun main(arg: Array<String>) {
         val config = LwjglApplicationConfiguration()
-        config.width = WIDTH
-        config.height = HEIGHT
+        config.width = WIDTH.toInt()
+        config.height = HEIGHT.toInt()
         config.resizable = false
         LwjglApplication(TheMazeGame(), config)
     }

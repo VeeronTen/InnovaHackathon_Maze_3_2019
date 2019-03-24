@@ -20,7 +20,7 @@ class MazeScreen(private val game: TheMazeGame) : Screen {
         stage = Stage()
         group = VerticalGroup()
 
-        group.setBounds(WIDTH.toFloat() - 100, 0F, WIDTH.toFloat(), HEIGHT.toFloat())
+        group.setBounds(WIDTH - 100, 0F, WIDTH, HEIGHT)
         group.width = 50F
 
         game.inputMultiplexer.addProcessor(stage)

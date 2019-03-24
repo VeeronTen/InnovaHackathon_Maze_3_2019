@@ -10,10 +10,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import veeronten.hackathon.screens.MenuScreen
 
-//todo to float all?
-const val WIDTH = 800
-const val HEIGHT = 480
-const val TILE_SIZE = 5
+const val WIDTH = 800F
+const val HEIGHT = 480F
+const val TILE_SIZE = 5F
 
 class TheMazeGame : Game() {
 
@@ -30,7 +29,7 @@ class TheMazeGame : Game() {
 
     override fun create() {
         camera = OrthographicCamera()
-        camera.setToOrtho(false, WIDTH.toFloat(), HEIGHT.toFloat())
+        camera.setToOrtho(false, WIDTH, HEIGHT)
         batch = SpriteBatch()
         font = BitmapFont()
 
