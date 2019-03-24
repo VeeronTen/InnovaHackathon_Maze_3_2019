@@ -138,7 +138,10 @@ class Straggler {
                     targets.add(point.withIncY())
                 }
 
-                targets.addAll( MazeSource.exitPoints.filter { pointIsVisible(it) && MazeSource.getValueByPoint(it) == KNOWN_FLOOR } )
+                MazeSource.exitPoints.forEach {
+                    if (pointIsVisible(it) && MazeSource.getValueByPoint(it) == KNOWN_FLOOR)
+                        targets.add(it)
+                }
             }
         }
     }
