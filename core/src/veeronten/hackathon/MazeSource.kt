@@ -26,6 +26,7 @@ object MazeSource {
     var mazeY = 50
 
     private val startPoints = GdxArray<Point>()
+    private val exitPoints = GdxArray<Point>()
 
     fun generate(width: Int, height: Int) {
         mazeX = width
@@ -34,12 +35,14 @@ object MazeSource {
         configStructureMaxSize = min(width, height) - 2
 
         startPoints.clear()
+        exitPoints.clear()
         setEmptyMaze()
 
         startPoints.add(Point(1, 1))
         startPoints.forEach {
             generateWays(it)
         }
+        addExit()
     }
 
     private fun generateWays(point: Point) {
@@ -210,6 +213,124 @@ object MazeSource {
             }
         }
     }
+
+//todo добавление выхода, когда невозможно
+    fun addExit() {
+
+        var stepsTillAdd = MathUtils.random(1, mazeY + mazeY)
+        var exit: Point? = null
+
+        var upInfinite = false
+        var rightInfinite = false
+        var downInfinite = false
+        var leftInfinite = false
+
+        while ( stepsTillAdd > 0 && (!upInfinite || !rightInfinite || !downInfinite || !leftInfinite)) {
+            var x = MathUtils.random(3)
+            when(x) {
+                0 -> {
+                    if (upInfinite) {}
+                    else {
+                        upInfinite = true
+                        do {
+                            for (x in 1 until mazeX - 1) {
+                                val point = Point(x, 0)
+                                if (getValueByPoint(point) != EMPTY && haveOneWay(point)) {
+                                    if (stepsTillAdd > 0) {
+                                        upInfinite = false
+                                        exit = point
+                                        stepsTillAdd--
+                                    }
+                                }
+                            }
+                        } while (!upInfinite && stepsTillAdd > 0)
+                    }
+                }
+                1 -> {
+                    if (rightInfinite) {}
+                    else {
+                        rightInfinite = true
+                        do{
+                            for (y in 1 until mazeY - 1) {
+                                val point = Point(mazeX - 1, y)
+                                if (getValueByPoint(point) != EMPTY && haveOneWay(point)) {
+                                    if (stepsTillAdd > 0) {
+                                        rightInfinite = false
+                                        exit = point
+                                        stepsTillAdd--
+                                    }
+                                }
+                            }
+                        } while (!rightInfinite && stepsTillAdd > 0)
+                    }
+                }
+                2 -> {
+                    if (downInfinite) {}
+                    else {
+                        downInfinite = true
+                        do {
+                            for (x in 1 until mazeX - 1) {
+                                val point = Point(x, mazeY - 1)
+                                if (getValueByPoint(point) != EMPTY && haveOneWay(point)) {
+                                    if (stepsTillAdd > 0) {
+                                        downInfinite = false
+                                        exit = point
+                                        stepsTillAdd--
+                                    }
+                                }
+                            }
+                        } while (!downInfinite && stepsTillAdd > 0)
+                    }
+                }
+                3 -> {
+                    if (leftInfinite) {}
+                    else {
+                        leftInfinite = true
+                        do {
+                            for (y in 1 until mazeY - 1) {
+                                val point = Point(0, y)
+                                if (getValueByPoint(point) != EMPTY && haveOneWay(point)) {
+                                    if (stepsTillAdd > 0) {
+                                        leftInfinite = false
+                                        exit = point
+                                        stepsTillAdd--
+                                    }
+                                }
+                            }
+                        } while (!leftInfinite && stepsTillAdd > 0)
+                    }
+                }
+            }
+        }
+
+        exit?.let {
+            setValueByPoint(exit, EMPTY)
+            exitPoints.add(it)
+        }
+    }
+
+    private fun haveOneWay(point: Point): Boolean {
+        val haveExitNear =
+                ( (point.y == 0 || point.y == mazeY - 1) && (point.x - 1 != -1 && getValueByPoint(point.withDecX()) == EMPTY) )
+                ||
+                ( (point.y == 0 || point.y == mazeY - 1) && (point.x + 1 != mazeX && getValueByPoint(point.withIncX()) == EMPTY) )
+                ||
+                ( (point.x == 0 || point.x == mazeX - 1) && (point.y - 1 != -1 && getValueByPoint(point.withDecY()) == EMPTY) )
+                ||
+                ( (point.x == 0 || point.x == mazeX - 1) && (point.y + 1 != mazeY && getValueByPoint(point.withIncY()) == EMPTY) )
+
+        return if (haveExitNear) false
+        else (point.x - 1 != -1 && getValueByPoint(point.withDecX()) == EMPTY)
+                ||
+                (point.x + 1 != mazeX && getValueByPoint(point.withIncX()) == EMPTY)
+                ||
+                (point.y - 1 != -1 && getValueByPoint(point.withDecY()) == EMPTY)
+                ||
+                (point.y + 1 != mazeY && getValueByPoint(point.withIncY()) == EMPTY)
+
+    }
+
+
 
     fun getValueByPoint(point: Point): Int = mazeArray[point.y][point.x]
     fun setValueByPoint(point: Point, value: Int) {

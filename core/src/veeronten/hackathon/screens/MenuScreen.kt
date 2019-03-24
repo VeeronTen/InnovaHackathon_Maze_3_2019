@@ -105,13 +105,17 @@ class MenuScreen(private val game: TheMazeGame) : Screen {
         roomHeightSlider.value = roomHeightDefault().toFloat()
 
 
-        addExit = createTextBtn("[ADD EXIT]") {}
+        addExit = createTextBtn("[ADD EXIT]") { MazeSource.addExit() }
 
         startBtn = createTextBtn("[START]") {
             game.inputMultiplexer.removeProcessor(stage)
             game.screen = MazeScreen(game)
         }
-
+//todo добавить комнату с колоннами и круги
+//todo скорость персонажа
+//todo оптимизация
+//todo концовка
+//todo графика
 //todo не видит через таргеты
 //todo или не прорисовывается там, где был таргет
 
