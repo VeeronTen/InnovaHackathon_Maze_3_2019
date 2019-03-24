@@ -23,9 +23,11 @@ class TheMazeGame : Game() {
     lateinit var wallVisibleImg: Texture
     lateinit var wallInvisible: Texture
     lateinit var knownFloor: Texture
-    lateinit var inputMultiplexer: InputMultiplexer
     lateinit var stragglerImg: Texture
     lateinit var targetImg: Texture
+
+    lateinit var inputMultiplexer: InputMultiplexer
+    lateinit var desctopInputProcessor: DesktopInputProcessor
 
     override fun create() {
         camera = OrthographicCamera()
@@ -40,7 +42,7 @@ class TheMazeGame : Game() {
         targetImg = Texture("target.png")
 
         inputMultiplexer = InputMultiplexer()
-        inputMultiplexer.addProcessor(DesktopInputProcessor(camera))
+        desctopInputProcessor = DesktopInputProcessor(camera)
         Gdx.input.inputProcessor = inputMultiplexer
 
         music = Gdx.audio.newMusic(Gdx.files.internal("OST.mp3"))

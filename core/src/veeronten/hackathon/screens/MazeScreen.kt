@@ -40,6 +40,7 @@ class MazeScreen(private val game: TheMazeGame) : Screen {
         group.width = 50F
 
         game.inputMultiplexer.addProcessor(stage)
+        game.inputMultiplexer.addProcessor(game.desctopInputProcessor)
 
         waitTillMoveLabel = Label("Move every 1.0 seconds", skin)
         waitTillMoveSlider = createSlider(0F, 5F, 1F, 0.1F, skin) {
@@ -50,7 +51,7 @@ class MazeScreen(private val game: TheMazeGame) : Screen {
         emptyLine1 = Label("\n", skin)
 
         backBtn = createTextBtn("[BACK]") {
-            game.inputMultiplexer.removeProcessor(stage)
+            game.inputMultiplexer.clear()
             game.screen = MenuScreen(game)
         }
 
@@ -62,6 +63,9 @@ class MazeScreen(private val game: TheMazeGame) : Screen {
             addActor(backBtn)
         }
     }
+
+    var framses = 0
+    var timeGone = 0F
 
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
@@ -84,12 +88,24 @@ class MazeScreen(private val game: TheMazeGame) : Screen {
                     game.batch.drawByCoord(game.targetImg, point)
                 }
 
+                straggler.currentTarget?.let {
+                    game.batch.drawByCoord(game.stragglerImg, it)
+                }
             }
         }
         game.batch.end()
         stage.draw()
 
         straggler.timeGone(delta)
+
+        framses++
+        timeGone += delta
+        //todo remove framerate
+        if (timeGone > 1) {
+            println(framses)
+            framses = 0
+            timeGone = 0F
+        }
     }
 
     override fun dispose() {

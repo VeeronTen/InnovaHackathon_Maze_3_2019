@@ -56,6 +56,8 @@ class MenuScreen(private val game: TheMazeGame) : Screen {
         }
 
         game.inputMultiplexer.addProcessor(stage)
+        game.inputMultiplexer.addProcessor(game.desctopInputProcessor)
+
 
         emptyLine1 = Label("\n", skin)
         emptyLine2 = Label("\n", skin)
@@ -103,14 +105,12 @@ class MenuScreen(private val game: TheMazeGame) : Screen {
         addExit = createTextBtn("[ADD EXIT]") { MazeSource.addExit() }
 
         startBtn = createTextBtn("[START]") {
-            game.inputMultiplexer.removeProcessor(stage)
+            game.inputMultiplexer.clear()
             game.screen = MazeScreen(game)
         }
 //todo добавить комнату с колоннами и круги
 //todo оптимизация
-//todo концовка
 //todo графика
-//todo камера двигается при работе с ползунками
 
         stage.addActor(rootGroup)
 

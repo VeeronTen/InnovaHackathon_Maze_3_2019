@@ -2,6 +2,7 @@ package veeronten.hackathon
 
 import com.badlogic.gdx.math.MathUtils
 import ktx.collections.GdxArray
+import ktx.collections.addAll
 import ktx.collections.gdxArrayOf
 import kotlin.math.abs
 import kotlin.math.max
@@ -17,9 +18,12 @@ class Straggler {
     private var pointsToWatch = GdxArray<Point>()
     private var visiblePoints = GdxArray<Point>()
 
-    var targets = GdxArray<Point>()
+    var targets = GdxArray<Point>() // todo the last is current, gold
+    var currentTarget: Point? = null
 
     private var path = GdxArray<Point>()
+
+    private var finished = false
 
     init {
         var startPoint: Point
@@ -45,12 +49,18 @@ class Straggler {
     }
 
     fun timeGone(timeGone: Float) {
+        if (finished) return
         timeWaiting += timeGone
         if (timeWaiting > waitTillMove) {
-            move()
             watch()
             findTargets()
             setTargetPathIfNeed()
+            move()
+            if (MazeSource.exitPoints.contains(position)) {
+                finished = true
+                currentTarget = null
+                targets.clear()
+            }
             timeWaiting = 0F
         }
     }
@@ -127,6 +137,8 @@ class Straggler {
                 if (point.y + 1 != MazeSource.mazeY && MazeSource.getValueByPoint(point.withIncY()) == EMPTY) {
                     targets.add(point.withIncY())
                 }
+
+                targets.addAll( MazeSource.exitPoints.filter { pointIsVisible(it) && MazeSource.getValueByPoint(it) == KNOWN_FLOOR } )
             }
         }
     }
@@ -158,7 +170,8 @@ class Straggler {
     private fun setTargetPathIfNeed() {
         if (path.isEmpty || !targets.contains(path.last())) {
             path.clear()
-            path.addAll(pathToSquare(targets.last()))
+            currentTarget = targets.firstOrNull { MazeSource.exitPoints.contains(it) } ?: targets.last()
+            path.addAll(pathToSquare(currentTarget!!))
         }
     }
 

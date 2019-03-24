@@ -24,7 +24,7 @@ object MazeSource {
     var mazeY = 50
 
     private val startPoints = GdxArray<Point>()
-    private val exitPoints = GdxArray<Point>()
+    val exitPoints = GdxArray<Point>()
 
     fun generate(width: Int, height: Int) {
         mazeX = width
@@ -172,7 +172,7 @@ object MazeSource {
             }
         }
 
-        stamp(tunnel, 1, 1, mazeX - 1, mazeY - 1)
+        stamp(tunnel)
     }
 
     fun addRoom(width: Int, height: Int) {
@@ -187,10 +187,10 @@ object MazeSource {
             }
         }
 
-        stamp(room, 1, 1, mazeX - 1, mazeY - 1)
+        stamp(room)
     }
 
-    private fun stamp(structure: GdxArray<GdxArray<Int>>, minX: Int, minY: Int, maxX: Int, maxY: Int) {
+    private fun stamp(structure: GdxArray<GdxArray<Int>>) {
         val sizeX = structure[0].size
         val sizeY = structure.size
 
@@ -202,8 +202,8 @@ object MazeSource {
 //        }
 //        println()
 
-        val fromX = MathUtils.random(minX, maxX - sizeX)
-        val fromY = MathUtils.random(minY, maxY - sizeY)
+        val fromX = MathUtils.random(1, mazeX - 1 - sizeX)
+        val fromY = MathUtils.random(1, mazeY - 1 - sizeY)
 
         for (y in 0 until sizeY) {
             for (x in 0 until sizeX) {
