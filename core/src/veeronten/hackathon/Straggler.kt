@@ -18,7 +18,7 @@ class Straggler {
     private var pointsToWatch = GdxArray<Point>()
     private var visiblePoints = GdxArray<Point>()
 
-    var targets = GdxArray<Point>() // todo the last is current, gold
+    var targets = GdxArray<Point>()
     var currentTarget: Point? = null
 
     private var path = GdxArray<Point>()

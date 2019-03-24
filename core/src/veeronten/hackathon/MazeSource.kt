@@ -1,9 +1,12 @@
 package veeronten.hackathon
 
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.MathUtils.cos
 import ktx.collections.GdxArray
 import ktx.collections.gdxArrayOf
+import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.sin
 
 const val EMPTY: Int = 0
 const val WALL_VISIBLE: Int = 1
@@ -172,7 +175,7 @@ object MazeSource {
             }
         }
 
-        stamp(tunnel)
+        stamp(tunnel, false)
     }
 
     fun addRoom(width: Int, height: Int) {
@@ -187,10 +190,44 @@ object MazeSource {
             }
         }
 
-        stamp(room)
+        stamp(room, false)
     }
 
-    private fun stamp(structure: GdxArray<GdxArray<Int>>) {
+    fun addCircleRoom(radius: Int) {
+        val result = GdxArray<GdxArray<Int>>().apply {
+            for (y in 0..radius * 2) {
+                val line = GdxArray<Int>()
+                for (x in 0..radius * 2) {
+                    line.add(WALL_INVISIBLE)
+                }
+                add(line)
+            }
+            val PI: Double = 3.1415926535
+            var angle: Double = 0.0
+            var x1: Double
+            var y1: Double
+
+            while (angle < 360) {
+                x1 = radius * cos((angle * PI / 180))
+
+                y1 = radius * sin((angle * PI / 180))
+
+                this[MathUtils.round((y1 + radius).toFloat())][MathUtils.round((x1 + radius).toFloat())] = EMPTY
+                angle += 1.0
+            }
+        }
+
+        val printEmpty = false
+        for(y in 0 until result.size) {
+            for(x in 0 until result[0].size) {
+                if (printEmpty) {
+                    result[y][x] = EMPTY
+                }
+            }
+        }
+        stamp(result, false)
+    }
+    private fun stamp(structure: GdxArray<GdxArray<Int>>, wallsToo: Boolean) {
         val sizeX = structure[0].size
         val sizeY = structure.size
 
@@ -207,7 +244,10 @@ object MazeSource {
 
         for (y in 0 until sizeY) {
             for (x in 0 until sizeX) {
-                mazeArray[fromY + y][fromX + x] = structure[y][x]
+                if (structure[y][x] == WALL_INVISIBLE && !wallsToo) {}
+                else {
+                    mazeArray[fromY + y][fromX + x] = structure[y][x]
+                }
             }
         }
     }

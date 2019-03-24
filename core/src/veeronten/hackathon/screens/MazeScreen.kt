@@ -81,17 +81,16 @@ class MazeScreen(private val game: TheMazeGame) : Screen {
                     WALL_INVISIBLE -> game.batch.drawByCoord(game.wallInvisible, point)
                     KNOWN_FLOOR -> game.batch.drawByCoord(game.knownFloor, point)
                 }
-
-                game.batch.drawByCoord(game.stragglerImg, straggler.position)
-
-                straggler.targets.forEach { point ->
-                    game.batch.drawByCoord(game.targetImg, point)
-                }
-
-                straggler.currentTarget?.let {
-                    game.batch.drawByCoord(game.stragglerImg, it)
-                }
             }
+        }
+        game.batch.drawByCoord(game.stragglerImg, straggler.position)
+
+        straggler.targets.forEach { point ->
+            game.batch.drawByCoord(game.targetImg, point)
+        }
+
+        straggler.currentTarget?.let {
+            game.batch.drawByCoord(game.stragglerImg, it)
         }
         game.batch.end()
         stage.draw()
